@@ -1,6 +1,7 @@
 from django.db import models
 from datetime import datetime
 from django.conf import settings
+from django.contrib.auth.models import AbstractUser 
 # Create your models here.
 class Tutorial(models.Model):
 	name = models.CharField(max_length = 25)
@@ -10,4 +11,11 @@ class Tutorial(models.Model):
 
 	def __str__(self):
 		return self.name
+
+class MyUser(AbstractUser):
+    image = models.FileField()
+    pass
+
+    def __str__(self):
+        return self.username
 

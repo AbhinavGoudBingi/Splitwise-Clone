@@ -15,8 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import url
 from django.contrib import admin
-from django.urls import include, path
+from django.urls import include, path ,re_path
 from . import views
+from django.conf import settings 
+from django.conf.urls.static import static 
 
 app_name = "main"
 
@@ -25,5 +27,10 @@ urlpatterns = [
     path("register/",views.register,name="register"),
     path("logout/", views.logout_request,name="logout"),
     path("login/", views.login_request,name="login"),
-    path("account/", views.account,name="account")
+    path("account/", views.account,name="account"),
+    re_path("get_user_profile/", views.get_user_profile,name="get_user_profile"),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

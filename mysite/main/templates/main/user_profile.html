@@ -1,0 +1,11 @@
+{% extends 'main/header.html' %}
+
+<br><br><br><br><br>
+{% block content %}
+  <img src="{{ user.image.url }}">
+  <br>
+  <p>Name : {{ user.username}}</p>
+  <br>
+  <p>User id:{{user.first_name}}</p>
+  <br>
+{% endblock %}
