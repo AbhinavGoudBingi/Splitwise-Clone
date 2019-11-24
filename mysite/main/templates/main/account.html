@@ -14,11 +14,22 @@
     <div class="nav-wrapper">
       <a href="/" class="brand-logo">Splitwise-Clone</a>
       <ul id="nav-mobile" class="right hide-on-med-and-down">
-        <li><a href="/">Home</a></li>
         {% if user.is_authenticated %}
-        <li><a href="/account"></a>Change Password</li>
+          <li><a href="/userpage">Home</a></li>
+          <li><a href="/friendspage">Friends</a></li>
+          {% if user.image %}
+        <li><img src="{{ user.image.url }}" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+          {% else %}
+          <li><img src="media/images/default.png" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+        {% endif %}
+          <li><a href="/get_user_profile">{{user.first_name}}</a></li>
         <li><a href="/logout">Logout</a></li>
-        <li><a href="/get_user_profile">{{user.username}}</a></li>
         {% else %}
         <li><a href="/register">Register</a></li>
         <li><a href="/login">Login</a></li>
@@ -52,7 +63,7 @@
     {% csrf_token %}
     {{form.as_p}}
 
-    <input type="submit" name="" vlaue="Change Password">
+    <input type="submit" name="" value="Change Password">
   </form>
 
 {% endblock %}

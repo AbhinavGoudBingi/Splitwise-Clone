@@ -1,7 +1,65 @@
-{% extends 'main/header.html' %}
+<head>
+    {% load static %}
+        <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+    <!-- Prism CSS -->
+    <link href="{% static 'tinymce/css/prism.css' %}" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
 
-{% block content %}
-  <div class="row">
+
+<body>
+  <nav>
+    <div class="nav-wrapper">
+      <a href="/" class="brand-logo">Splitwise-Clone</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        {% if user.is_authenticated %}
+        {% if user.image %}
+        <li><img src="{{ user.image.url }}" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+          {% else %}
+          <li><img src="media/images/default.png" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+        {% endif %}
+        <li><a href="/get_user_profile">{{user.first_name}}</a></li>
+          <li><a href="/flist">Activity</a> </li>
+          <li><button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Insight</button></li>
+       <li><a href="/account">Change Password</a></li>
+        <li><a href="/logout">Logout</a></li>
+        {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        {% endif %}
+
+      </ul>
+    </div>
+  </nav>
+
+   {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success'%}
+                <script>M.toast({html: "{{message}}", classes: 'green rounded', displayLength:2000});</script>
+            {% elif message.tags == 'info'%}
+                <script>M.toast({html: "{{message}}", classes: 'blue rounded', displayLength:2000});</script>
+            {% elif message.tags == 'warning'%}
+                <script>M.toast({html: "{{message}}", classes: 'orange rounded', displayLength:10000});</script>
+            {% elif message.tags == 'error'%}
+                <script>M.toast({html: "{{message}}", classes: 'red rounded', displayLength:10000});</script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+  <div class="container">
+  	<br>
+  {% block content %}
+        <div class="row">
         <div class="col s12 m6">
           <div class="card blue-grey darken-1 hoverable">
             <div class="card-content white-text">
@@ -11,4 +69,36 @@
             </div>
           </div>
         </div>
-{% endblock %}
+  </div>
+  {% endblock %}
+</div>
+
+<div class="modal fade" id="myModal" role="dialog">
+    <div class="modal-dialog">
+
+      <!-- Modal content-->
+      <div class="modal-content">
+        <div class="modal-header">
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">Select dates to review your activity</h4>
+        </div>
+        <div class="modal-body">
+          <form action="{% url 'main:insight' %}" method="POST">
+              {% csrf_token %}
+  Start Date: <input type="date" name="start">
+              End date: <input type="date" name="end">
+  <input type="submit">
+</form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+
+<!-- Prism JS -->
+<script src="{% static 'tinymce/js/prism.js' %}"></script>
