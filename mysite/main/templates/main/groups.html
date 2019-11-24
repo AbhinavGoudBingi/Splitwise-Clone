@@ -1,0 +1,99 @@
+<head>
+    {% load static %}
+    <!-- Prism CSS -->
+    <link href="{% static 'tinymce/css/prism.css' %}" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+
+
+<body>
+  <nav>
+    <div class="nav-wrapper">
+      <a href="/userpage" class="brand-logo">Splitwise-Clone</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        {% if user.is_authenticated %}
+          <li><a href="/userpage">Home</a></li>
+          <li><a href="/friendspage">Friends</a></li>
+          <li><a href="/groupslistpage">Groups</a></li>
+        {% if user.image %}
+        <li><img src="{{ user.image.url }}" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+          {% else %}
+          <li><img src="media/images/default.png" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+        {% endif %}
+        <li><a href="/get_user_profile">{{user.first_name}}</a></li>
+          <li><a href="/flist">Activity</a> </li>
+        <li><a href="/account">Change Password</a></li>
+        <li><a href="/logout">Logout</a></li>
+        {% else %}
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        {% endif %}
+
+      </ul>
+    </div>
+  </nav>
+
+   {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success'%}
+                <script>M.toast({html: "{{message}}", classes: 'green rounded', displayLength:2000});</script>
+            {% elif message.tags == 'info'%}
+                <script>M.toast({html: "{{message}}", classes: 'blue rounded', displayLength:2000});</script>
+            {% elif message.tags == 'warning'%}
+                <script>M.toast({html: "{{message}}", classes: 'orange rounded', displayLength:10000});</script>
+            {% elif message.tags == 'error'%}
+                <script>M.toast({html: "{{message}}", classes: 'red rounded', displayLength:10000});</script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+  <div class="container">
+  	<br>
+  {% block content %}
+  {% endblock %}
+</div>
+
+
+<!-- Prism JS -->
+<script src="{% static 'tinymce/js/prism.js' %}"></script>
+
+<div class="row">
+    {% for groups in grouptrans %}
+        <div class="col s12 m6">
+          <div class="card blue-grey darken-1 hoverable" style="position: relative;">
+            <div class="card-content white-text">
+                {% if current_user.username == groups.username %}
+                <a href="{% url 'main:grouppage' group_name=groups.gpname %}">
+                    <span class="card-title" style="position:absolute; top:2px; right:2px;">{{groups.gpname}}</span>
+                </a>
+                    {% if groups.netmoney_owed < groups.netmoney_owes %}
+                <p style="position:absolute; top:2px; right:2px;">You owe {{groups.netmoney}} to this group</p>
+                    {% elif groups.netmoney_owed == groups.netmoney_owes %}
+                <p style="position:absolute; bottom:2px; right:2px;">You are settled up!</p>
+                    {% elif friends.netmoney_owed  > groups.netmoney_owes %}
+                <p style="position:absolute;  right:2px;">Group Owes you {{groups.netmoney}}</p>
+                    {% endif %}
+                {% endif %}
+            </div>
+          </div>
+        </div>
+    {% endfor %}
+</div>
+
+<br><br>
+
+<a href="/group_form">Add Group</a>
+<br><br>
+
+
+
+
+</body>

@@ -1,3 +1,4 @@
+Transaction_id,username,friendname,money,description,tag,date
 5,goat,juice,45,hello,Cinema,11/23/19
 7,goat,hello,-25,hi,Travel,11/23/19
 9,goat,hello,40,zjnjZ,Restaurant,11/23/19

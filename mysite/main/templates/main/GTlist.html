@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head xmlns="http://www.w3.org/1999/html">
+    {% load static %}
+    <!-- Prism CSS -->
+    <link href="{% static 'tinymce/css/prism.css' %}" rel="stylesheet">
+    <!-- Compiled and minified CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <!-- Compiled and minified JavaScript -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+</head>
+
+
+<body>
+  <nav>
+    <div class="nav-wrapper">
+      <a href="/userpage" class="brand-logo">Splitwise-Clone</a>
+      <ul id="nav-mobile" class="right hide-on-med-and-down">
+        {% if user.is_authenticated %}
+          <li><a href="/userpage">Home</a></li>
+          <li><a href="/friendspage">Friends</a></li>
+          <li><a href="/groupslistpage">Groups</a></li>
+        {% if user.image %}
+        <li><img src="{{ user.image.url }}" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+          {% else %}
+          <li><img src="media/images/default.png" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  vertical-align: middle;"></li>
+        {% endif %}
+        <li><a href="/get_user_profile">{{user.first_name}}</a></li>
+        <li><a href="/account">Change Password</a></li>
+        <li><a href="/logout">Logout</a></li>
+        {% else %}
+          <li><a href="/">Home</a></li>
+        <li><a href="/register">Register</a></li>
+        <li><a href="/login">Login</a></li>
+        {% endif %}
+
+      </ul>
+    </div>
+  </nav>
+
+   {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success'%}
+                <script>M.toast({html: "{{message}}", classes: 'green rounded', displayLength:2000});</script>
+            {% elif message.tags == 'info'%}
+                <script>M.toast({html: "{{message}}", classes: 'blue rounded', displayLength:2000});</script>
+            {% elif message.tags == 'warning'%}
+                <script>M.toast({html: "{{message}}", classes: 'orange rounded', displayLength:10000});</script>
+            {% elif message.tags == 'error'%}
+                <script>M.toast({html: "{{message}}", classes: 'red rounded', displayLength:10000});</script>
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+  <div class="container">
+  	<br>
+  {% block content %}
+  {% endblock %}
+</div>
+
+
+<!-- Prism JS -->
+<script src="{% static 'tinymce/js/prism.js' %}"></script>
+
+
+<a href="{% url 'main:settleup_ingroup' group_name=groupname %}">Settle Up</a>
+
+<br><br>
+{% for groups in gtrans %}
+    {% if groups.activity_name == "settle up" %}
+        {% if not groups.money_took == 0 %}
+        <p>{{groups.username}} settled up with {{groups.frname}} by giving {{groups.money_took}}</p>
+        {% else %}
+        <p>{{groups.username}} settled up with {{groups.frname}} by taking {{groups.money_given}}</p>
+        {% endif %}
+    {% elif not groups.tag == "group_creation" %}
+    <p>{{groups.activityname}}</p>
+    <p>{{groups.username}} paid {{groups.money_gave}} and owes {{groups.money_took}}</p>
+    {% endif %}
+{% endfor %}
+
+
+
+
+
+
+
+
+{% for person in group_members %}
+    {% for groups in gtable %}
+        {% if person == groups.frname %}
+            <p>{{ person }} owes {{groups.netmoney}}</p>
+        {% endif%}
+    {% endfor %}
+{% endfor %}
+
+
+
+</body>
+
+<script>
+    function r(s){
+    return abs(s);
+    }
+</script>
+
+</html>

@@ -36,6 +36,11 @@ urlpatterns = [
     path("insight", views.insight, name="insight"),
     path("thokka/<str:name>", views.thokka, name="thokka"),
     re_path("get_user_profile/", views.get_user_profile, name="get_user_profile"),
+    url(r'^select2/', include('django_select2.urls')),
+    path("group_form/", views.group_form, name="group_form"),
+    path("groupslistpage/", views.groupslistpage, name="groupslistpage"),
+    path("grouppage/<str:group_name>", views.grouppage, name="grouppage"),
+    path("settleup_ingroup/<str:group_name>",views.settleup_ingroup,name="settleup_ingroup",)
 ]
 
 if settings.DEBUG:
