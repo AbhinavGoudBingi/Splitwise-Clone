@@ -86,7 +86,7 @@
                 {% endif %}
                  <span class="card-title" style="position:absolute; top:10px; right:10px;">{{foo.first_name}}</span>
                 {% if friends.money < 0 %}
-                <p style="position:absolute; right:5px;">You borrowed {{friends.money}}</p>
+                <p style="position:absolute; right:5px;">You borrowed {% widthratio friends.money 1 -1 %}</p>
                 {% elif friends.money > 0 %}
                 <p style="position:absolute;  right:5px;">{{friends.money}} was borrowed from you</p>
                 {% endif %}

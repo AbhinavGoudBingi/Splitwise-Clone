@@ -60,11 +60,12 @@ class FriendT(models.Model):
 
 class GroupTable(models.Model):
     gpname = models.CharField(max_length=200, default=None)
-    activityname=models.CharField(max_length=200,default=None)
-    username = models.CharField(max_length=25,default=None)
-    frname = models.CharField(max_length=25,default=None)
+    activityname = models.CharField(max_length=200, default=None)
+    username = models.CharField(max_length=25, default=None)
+    frname = models.CharField(max_length=25, default=None)
     money = models.IntegerField()
     time = models.CharField(default=datetime.now().strftime('%x'), max_length=25)
+
     @classmethod
     def add_group(cls, group_name, user_name, friend_name):
         group1 = cls.objects.get_or_create(
@@ -83,34 +84,32 @@ class GroupTable(models.Model):
         )
 
     @classmethod
-    def add_rows(cls, group_name,activity_name,user_name,friend_name,money1):
+    def add_rows(cls, group_name, activity_name, user_name, friend_name, money1):
         group1 = cls.objects.create(
             gpname=group_name,
             activityname=activity_name,
             username=user_name,
             frname=friend_name,
-            money=int(money1),
+            money=money1,
         )
-        revgroup1=cls.objects.create(
+        revgroup1 = cls.objects.create(
             gpname=group_name,
             activityname=activity_name,
             username=friend_name,
             frname=user_name,
-            money=-(int(money1)),
+            money=-(money1),
         )
     # @classmethod
     # def forsettleup(cls,group_name,user_name,friend_name):
 
 
-
-
 class GroupTrans(models.Model):
-    gpname = models.CharField(max_length=200,default=None)
+    gpname = models.CharField(max_length=200, default=None)
     activityname = models.CharField(max_length=200)
-    username = models.CharField(max_length=25,default=None)
+    username = models.CharField(max_length=25, default=None)
     money_gave = models.IntegerField()
     money_took = models.IntegerField()
-    tag=models.CharField(max_length=50)
+    tag = models.CharField(max_length=50)
     # description = models.TextField()
     time = models.CharField(default=datetime.now().strftime('%x'), max_length=25)
 
@@ -122,32 +121,30 @@ class GroupTrans(models.Model):
             username=current_user,
             money_took=0,
             money_gave=0,
-            tag = "group_creation",
+            tag="group_creation",
             # description = notes,
-            )
+        )
 
         for all_users in friends:
-            group=cls.objects.get_or_create(
+            group = cls.objects.get_or_create(
                 gpname=group_name,
                 activityname="",
                 username=all_users,
-                money_took = 0,
-                money_gave = 0,
+                money_took=0,
+                money_gave=0,
                 tag="group_creation",
                 # description=notes,
-                )
+            )
 
     @classmethod
-    def add_activity_and_user(cls,group_name,activity_name,user,tagging,money_owed,money_owes):
-        activity_add=cls.objects.get_or_create(
+    def add_activity_and_user(cls, group_name, activity_name, user, tagging, money_owed, money_owes):
+        activity_add = cls.objects.get_or_create(
             gpname=group_name,
-            activityname=activity_name,#if activity_name=="settle up",then settle between the friends
+            activityname=activity_name,  # if activity_name=="settle up",then settle between the friends
             username=user,
             tag=tagging,
-            description=descriptions,
-            money_gave=int(money_owed),
-            money_took=int(money_owes),
-            time=models.DateTimeField(default=timezone.now()))
+            money_gave=money_owed,
+            money_took=money_owes,)
     # @classmethod
     # def add_transaction(cls,group_name,current_user,friend,notes,money):
     #     transaction_add = cls.objects.get_or_create(

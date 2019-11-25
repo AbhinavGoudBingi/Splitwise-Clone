@@ -37,10 +37,14 @@ urlpatterns = [
     path("thokka/<str:name>", views.thokka, name="thokka"),
     re_path("get_user_profile/", views.get_user_profile, name="get_user_profile"),
     url(r'^select2/', include('django_select2.urls')),
+    path("settleup_ingroup/<str:group_name>", views.settleup_ingroup, name="settleup_ingroup"),
     path("group_form/", views.group_form, name="group_form"),
+    path("process_group_form/", views.process_group_form, name="process_group_form"),
+    # path("group_transaction_form/<str:thisgroup_name>", views.group_transaction_form, name="group_transaction_form"),
+    path("process_group_transaction/<str:thisgroup_name>", views.process_group_transaction, name="process_group_transaction"),
     path("groupslistpage/", views.groupslistpage, name="groupslistpage"),
     path("grouppage/<str:group_name>", views.grouppage, name="grouppage"),
-    path("settleup_ingroup/<str:group_name>",views.settleup_ingroup,name="settleup_ingroup",)
+    path("ouredirect/<str:name>", views.ouredirect, name="ouredirect"),
 ]
 
 if settings.DEBUG:

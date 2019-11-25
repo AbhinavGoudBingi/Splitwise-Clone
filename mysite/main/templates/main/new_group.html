@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<style type="text/css">
+		:root{
+	--bg-color :white;
+  --tex-color :black;
+};
+
+.jumbotron p {
+	padding-left: 2%;
+}
+ 
+.registration-form {
+  padding:50px 0;
+}
+
+.registration-form form {
+  max-width:800px;
+  padding:50px 70px;
+  border-radius:10px;
+  box-shadow:4px 4px 15px rgba(0, 0, 0, 0.2);
+  background-color:var(--bg-color);
+}
+
+.registration-form form h3 {
+  font-weight:bold;
+  margin-bottom:30px;
+}
+
+.registration-form .item {
+  border-radius:10px;
+  margin-bottom:25px;
+  padding:10px 20px;
+}
+
+.registration-form .create-account {
+  border-radius:30px;
+  padding:10px 20px;
+  font-size:18px;
+  font-weight:bold;
+  background-color:#3f93ff;
+  border:none;
+  color:white;
+  margin-top:20px;	
+}
+	</style>
+	<title>Adding New Group</title>
+	<meta charset="utf-8">
+  	<meta name="viewport" content="width=device-width, initial-scale=1">
+  	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+  	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+  	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+  	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+  	<link href="https://fonts.googleapis.com/css?family=Architects+Daughter|Bellefair|Inconsolata|Indie+Flower|Lemonada|Lobster|Noto+Sans|Oswald|Plaster" rel="stylesheet">
+  	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+</head>
+<body>
+  <div align="center" id="GrpTrans" class="container registration-form" style="background-color:rgba(0,0,0,0)">
+    <form action="{% url 'main:process_group_form'%}" enctype="multipart/form-data" method="POST" style="height:700px;overflow-y: scroll">
+      {% csrf_token %}
+      <h3 class="text-center"></h3>
+      <div class="form-group">
+        <input class="form-control item" type="text" name="name" id="activity"  placeholder="Group Name Here" required>
+      </div>
+      <div class="form-group">
+      	<p align="left" style="font-family: Indie;font-size: 150%">Who do you want in this Group?</p>
+        <fieldset align="left">
+      	{% block content %}
+      		{% for friends in friendslist %}
+          <input type="checkbox" name="{{friends}}" value="{{friends}}"/>
+          <span style="padding-left: 10px">{{friends}}</span><br>
+        	{% endfor %}
+        </fieldset>
+      </div>
+        {% endblock %}
+      <div class="form-group">
+        <button class="btn btn-primary btn-block create-account" type="submit" onclick="set()">Submit</button>
+      </div>
+    </form>
+    </div>
+</body>
+</html>

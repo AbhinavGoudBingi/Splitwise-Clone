@@ -84,13 +84,6 @@
     {% endif %}
 {% endfor %}
 
-
-
-
-
-
-
-
 {% for person in group_members %}
     {% for groups in gtable %}
         {% if person == groups.frname %}
@@ -99,14 +92,24 @@
     {% endfor %}
 {% endfor %}
 
+  {% for entry in nets %}
+  {% if entry < 0 %}
+  {{entry}} owes net {% widthratio entry 1 -1 %}
+  {% elif entry > 0 %}
+  {{entry}} is owed {{entry}}
+  {% endif %}
+  {% endfor %}
 
+  {% for ky in use %}
+  {% if ky < 0 %}
+  {{ky}} owes you {% widthratio ky 1 -1 %}
+  {% elif ky > 0 %}
+  You owe {{ky}} to {{ky}}
+  {% endif %}
+  {% endfor %}
+
+<a href="{% url 'main:ouredirect' name=groupname %}">Add group Transaction</a>
 
 </body>
-
-<script>
-    function r(s){
-    return abs(s);
-    }
-</script>
 
 </html>

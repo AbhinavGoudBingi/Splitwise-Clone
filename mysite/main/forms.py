@@ -4,6 +4,8 @@ from .models import *
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 
 from django_select2.forms import Select2MultipleWidget
+
+
 class MyForm(UserCreationForm):
     class Meta:
         model = MyUser
@@ -76,90 +78,92 @@ class TransactionForm(forms.Form):
         fs = cleaned_data.get('fs')
         split = cleaned_data.get('split')
 
-        if not(money and friend and tag):
+        if not (money and friend and tag):
             raise forms.ValidationError("Please don't waste your time by not filling the form properly")
 
         if split:
-            if not(ys and fs) or not (money == ys+fs):
+            if not (ys and fs) or not (money == ys + fs):
                 raise forms.ValidationError("Enter the amounts")
         else:
             if ys or fs:
                 raise forms.ValidationError("Select split using amounts for individual amounts")
 
-class ActivityTransactionForm(forms.ModelForm):
-    activity=forms.CharField(label="Enter a description",max_length=200)
-    # all_friends_in_activity=forms.ModelMultipleChoiceField(label='Friend ids',queryset=GroupTrans.objects.filter(gpname=))
-    money=forms.IntegerField(label='Amount')
-    friends_and_money_paid_by_each = forms.CharField(label="Fill the friends and money paid by each")
-    TAG_CHOICES = [
-        ('Restaurant', 'Restaurant'), ('Cinema', 'Cinema'), ('Travel', 'Travel'), ('Others', 'Others')
-    ]
-    tag = forms.ChoiceField(label='Tag ', choices=TAG_CHOICES)
-    # DISPLAY_CHOICES = (
-    #     ("You paid", "You paid"),
-    #     ("Paid by friend", "Paid by friend"),
-    # )
-    # paid = forms.ChoiceField(widget=forms.RadioSelect, choices=DISPLAY_CHOICES)
-    SPLIT_CHOICES=(
-        ("Split Equally","Split Equally"),
-        ("Split Manually","Split Manually"),
-    )
-    split =forms.ChoiceField(widget=forms.RadioSelect,choices=SPLIT_CHOICES)
-    # amount_string=forms.CharField(label='Enter amount each person spent in order by ","')
-    amount_string=forms.CharField(label="Fill the friends who spent the money along with how much they spent")
-    def clean(self):
-        cleaned_data = super(ActivityTransactionForm, self).clean()
-        activity=cleaned_data.get('activity')
-        # all_friends_in_activity=cleaned_data.get('all_friends_in_activity')
-        friends_and_money_paid_by_each=cleaned_data.get('friends_and_money_paid_by_each')
-        money=cleaned_data.get('money')
-        # l1=friends_and_money_paid_by_each.split(";")
-        # l2=[]
-        # if split==
-        # for ele in l1:
-        #     dummy1=ele.split(",")
-        #     dummy1[1]=int(dummy1[1])
-        #     l2.append(dummy1)
-        # s = []
-        # split_chosen=cleaned_data.get('split')
-        # for i in range(0, len(all_friends_in_activity)):
-        #     s.append(money/len(all_friends_in_activity))
+
+# class ActivityTransactionForm(forms.ModelForm):
+#     activity=forms.CharField(label="Enter a description",max_length=200)
+#     # all_friends_in_activity=forms.ModelMultipleChoiceField(label='Friend ids',queryset=GroupTrans.objects.filter(gpname=))
+#     money=forms.IntegerField(label='Amount')
+#     friends_and_money_paid_by_each = forms.CharField(label="Fill the friends and money paid by each")
+#     TAG_CHOICES = [
+#         ('Restaurant', 'Restaurant'), ('Cinema', 'Cinema'), ('Travel', 'Travel'), ('Others', 'Others')
+#     ]
+#     tag = forms.ChoiceField(label='Tag ', choices=TAG_CHOICES)
+#     # DISPLAY_CHOICES = (
+#     #     ("You paid", "You paid"),
+#     #     ("Paid by friend", "Paid by friend"),
+#     # )
+#     # paid = forms.ChoiceField(widget=forms.RadioSelect, choices=DISPLAY_CHOICES)
+#     SPLIT_CHOICES=(
+#         ("Split Equally","Split Equally"),
+#         ("Split Manually","Split Manually"),
+#     )
+#     split =forms.ChoiceField(widget=forms.RadioSelect,choices=SPLIT_CHOICES)
+#     amount_list
+#     # amount_string=forms.CharField(label='Enter amount each person spent in order by ","')
+#     amount_list=forms.CharField(label="Fill the friends who spent the money along with how much they spent")
+#     def clean(self):
+#         cleaned_data = super(ActivityTransactionForm, self).clean()
+#         activity=cleaned_data.get('activity')
+#         # all_friends_in_activity=cleaned_data.get('all_friends_in_activity')
+#         friends_and_money_paid_by_each=cleaned_data.get('friends_and_money_paid_by_each')
+#         money=cleaned_data.get('money')
+#         l1=friends_and_money_paid_by_each.split(";")
+#         l2=[]
+#         if split==
+#         for ele in l1:
+#             dummy1=ele.split(",")
+#             dummy1[1]=int(dummy1[1])
+#             l2.append(dummy1)
+#         s = []
+#         split_chosen=cleaned_data.get('split')
+#         for i in range(0, len(all_friends_in_activity)):
+#             s.append(money/len(all_friends_in_activity))
 
 
-    # def splitunequally(self):
-    #     n1=self.all_friends_in_activity
-    #     a=self.amount_list
-    #     l1=[]
-    #     if len(a)-len(n1)==1:
-    #         sum=0
-    #         for num in a:
-    #             sum=sum+num
-    #         if sum==self.money:
-    #             l1.append([currentuser,a[0]])
-    #             for i in range(1,len(a)):
-    #                 l1.append([n1[i],amount_list[i]])
-    #                 return l1
-    #         else:
-    #             raise forms.ValidationError("Split the money properly")
-    #     else:
-    #         raise forms.ValidationError("Give money spent for each person")
-
+#     def splitunequally(self):
+#         n1=self.all_friends_in_activity
+#         a=self.amount_list
+#         l1=[]
+#         if len(a)-len(n1)==1:
+#             sum=0
+#             for num in a:
+#                 sum=sum+num
+#             if sum==self.money:
+#                 l1.append([currentuser,a[0]])
+#                 for i in range(1,len(a)):
+#                     l1.append([n1[i],amount_list[i]])
+#                     return l1
+#             else:
+#                 raise forms.ValidationError("Split the money properly")
+#         else:
+#             raise forms.ValidationError("Give money spent for each person")
 
 
 class GroupForm(forms.Form):
-    group=forms.CharField(label='Group Name',max_length=100)
+    group = forms.CharField(label='Group Name', max_length=100)
     # friends=forms.ModelMultipleChoiceField(label='Friend ids',queryset=MyUser.objects.all(),widget=Select2MultipleWidget)
-    friends=forms.CharField(label='Usernames of people')
+    friends = forms.CharField(label='Usernames of people')
+
     def clean(self):
         cleaned_data = super(GroupForm, self).clean()
-        group_name=cleaned_data.get('group')
+        group_name = cleaned_data.get('group')
         friends_list = cleaned_data.get('friends').split(",")
         for friend in friends_list:
             if MyUser.objects.filter(username=friend).exists():
                 continue
             else:
                 raise forms.ValidationError('{0} is not there in the list of users,try once again.'.format(friend))
-        if len(friends_list)==0:
+        if len(friends_list) == 0:
             raise forms.ValidationError("Select a person or follow the guidelines")
 
 
@@ -179,5 +183,43 @@ class SettleUpGroup(forms.Form):
             forms.ValidationError("Please fill the form properly")
 
 
+class ActivityTransactionForm(forms.ModelForm):
+    users = forms.CharField(label="Members participating", max_length=200)
+    activity = forms.CharField(label="Enter a description", max_length=200)
+    # all_friends_in_activity=forms.ModelMultipleChoiceField(label='Friend ids',queryset=GroupTrans.objects.filter(gpname=))
+    money = forms.IntegerField(label='Amount')
+    friends_and_money_paid_by_each = forms.CharField(label="Fill the friends and money paid by each")
+    TAG_CHOICES = [
+        ('Restaurant', 'Restaurant'), ('Cinema', 'Cinema'), ('Travel', 'Travel'), ('Others', 'Others')
+    ]
+    tag = forms.ChoiceField(label='Tag ', choices=TAG_CHOICES)
+    # DISPLAY_CHOICES = (
+    #     ("You paid", "You paid"),
+    #     ("Paid by friend", "Paid by friend"),
+    # )
+    # paid = forms.ChoiceField(widget=forms.RadioSelect, choices=DISPLAY_CHOICES)
+    SPLIT_CHOICES = (
+        ("Split Equally", "Split Equally"),
+        ("Split Manually", "Split Manually"),
+    )
+    split = forms.ChoiceField(widget=forms.RadioSelect, choices=SPLIT_CHOICES)
+    # amount_string=forms.CharField(label='Enter amount each person spent in order by ","')
+    amount_string = forms.CharField(label="Fill the friends who spent the money along with how much they spent")
 
-
+    def clean(self):
+        cleaned_data = super(ActivityTransactionForm, self).clean()
+        activity = cleaned_data.get('activity')
+        # all_friends_in_activity=cleaned_data.get('all_friends_in_activity')
+        friends_and_money_paid_by_each = cleaned_data.get('friends_and_money_paid_by_each')
+        money = cleaned_data.get('money')
+        # l1=friends_and_money_paid_by_each.split(";")
+        # l2=[]
+        # if split==
+        # for ele in l1:
+        #     dummy1=ele.split(",")
+        #     dummy1[1]=int(dummy1[1])
+        #     l2.append(dummy1)
+        # s = []
+        # split_chosen=cleaned_data.get('split')
+        # for i in range(0, len(all_friends_in_activity)):
+        #     s.append(money/len(all_friends_in_activity))

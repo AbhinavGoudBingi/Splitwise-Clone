@@ -96,25 +96,48 @@ label:active:after {
 </head>
 <body>
   <div align="center" id="GrpTrans" class="container registration-form" style="background-color:rgba(0,0,0,0)">
-    <form action="" method="POST">
+    <form action="{% url 'main:process_group_transaction' thisgroup_name=group_name %}" enctype="multipart/form-data" method="POST" style="height:700px;overflow-y: scroll">
+      {% csrf_token %}
       <h3 class="text-center"></h3>
       <div class="form-group">
-        <input class="form-control item" type="text" name="name" maxlength="15" minlength="6" pattern="^[a-zA-Z0-9_.-]*$" id="activity" placeholder="What did You fucking spend on?" required>
+        <input class="form-control item" type="text" name="name" id="activity" placeholder="What did You fucking spend on?" required>
       </div>
       <div class="form-group">
-        <input class="form-control item" type="Number" name="rollno" minlength="9" id="password" placeholder="Money Spent in Rupees" pattern="^[0-9]*$" required>
+        <input class="form-control item" type="Number" name="money" minlength="9" id="password" placeholder="Money Spent in Rupees" pattern="^[0-9]*$" required>
+      </div>
+      <div class="form-group">
+        <p align="left" style="font-family: Indie">Select a tag
+          <span>
+            <select name="Tag">
+              <option value="Restaurant">Restaurant</option>
+              <option value="Cinema">Cinema</option>
+              <option value="Travel">Travel</option>
+              <option value="Others">Others</option>
+            </select>
+          </span>
+        </p>
       </div>
       <div class="form-group">
       	<p align="left" style="font-family: Indie">Who paid how much</p>
       	{% block content %}
       		{% for friends in frlist %}
-          <input class="form-control item" style="width: 50%"type="text" name="Comment" id="{{friends}}" placeholder={{friends}} default='0'>
+          <input class="form-control item" style="width: 50%"type="Number" name="{{friends}}" id="{{friends}}" placeholder={{friends}} default='0'>
         	{% endfor %}
       </div>
+        <div>
+           <p align="left" style="font-family: Indie">How to split:
+          <span>
+            <select name="Mode">
+              <option value="Equal">Equally</option>
+              <option value="Unequal">Unequally</option>
+            </select>
+          </span>
+        </p>
+        </div>
       <div class="form-group">
         <p align="left" style="font-family: Indie">Who spent how much</p>
           {% for friends in frlist %}
-          <input class="form-control item" style="width: 50%"type="text" name="Comment" id="{{friends}}:new" placeholder={{friends}} default='0'>
+          <input class="form-control item" style="width: 50%"type="Number" name="{{friends}}:new" id="{{friends}}:new" placeholder={{friends}} default='0'>
           {% endfor %}
       </div>
         {% endblock %}
