@@ -103,12 +103,25 @@
         <div class="col s12">
            <div class="card blue-grey darken-1 hoverable" style="position: relative;">
             <div class="card-content white-text">
-                <a href="{% url 'main:grouppage' group_name=group.gpname %}"> <span class="card-title" >{{friend}}</span></a>
-                {% if group.money < 0 %}
-                <p>You borrowed {% widthratio group.money 1 -1 %}</p>
-                {% elif group.money > 0 %}
-                <p>{{group.money}} was borrowed from you</p>
+                {% for foo in users %}
+                {% if foo.username == friends.fdname %}
+                {% if foo.image %}
+        <img src="{{ foo.image.url }}" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;">
+                {% else %}
+          <img src="media/images/default.png" alt="Avatar" class="avatar" style="width: 50px;
+  height: 50px;
+  border-radius: 50%;">
                 {% endif %}
+                 <span class="card-title" style="position:absolute; top:10px; right:10px;">{{foo.first_name}}</span>
+                {% if friends.money < 0 %}
+                <p style="position:absolute; right:5px;">You borrowed {% widthratio friends.money 1 -1 %}</p>
+                {% elif friends.money > 0 %}
+                <p style="position:absolute;  right:5px;">{{friends.money}} was borrowed from you</p>
+                {% endif %}
+        {% endif %}
+        {% endfor %}
             </div>
           </div>
         </div>
@@ -116,20 +129,6 @@
     {% endfor %}
 </div>
 
-<br><br>
-
-<a href="/transaction_form">Add Transaction</a>
-<br><br>
-<a href="{% url 'main:settleup' name=friend %}">Settle up</a>
-
-
-
 </body>
-
-<script>
-    function r(s){
-    return abs(s);
-    }
-</script>
 
 </html>

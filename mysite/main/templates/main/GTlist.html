@@ -69,42 +69,56 @@
 
 
 <a href="{% url 'main:settleup_ingroup' group_name=groupname %}">Settle Up</a>
-
+<a href="{% url 'main:leave_group' group_name=groupname %}">Leave group</a>
+<a href="{% url 'main:delete_group' group_name=groupname %}">Delete Group</a> 
 <br><br>
+  <div class="row">
 {% for groups in gtrans %}
-    {% if groups.activity_name == "settle up" %}
-        {% if not groups.money_took == 0 %}
-        <p>{{groups.username}} settled up with {{groups.frname}} by giving {{groups.money_took}}</p>
-        {% else %}
-        <p>{{groups.username}} settled up with {{groups.frname}} by taking {{groups.money_given}}</p>
-        {% endif %}
-    {% elif not groups.tag == "group_creation" %}
+        <div class="col s12">
+           <div class="card blue-grey darken-1 hoverable" style="position: relative;">
+               {% if groups.activity_name == "settle up" %}
+               <div class="card-content white-text">
+                 <span class="card-title" style="position:absolute; top:10px; right:10px;">{{groups.username}}</span>
+                 {% if not groups.money_took == 0 %}
+                <p>{{groups.username}} settled up with {{groups.frname}} by giving {{groups.money_took}}</p>
+                {% elif friends.money > 0 %}
+                <p style="position:absolute;  right:5px;">{{friends.money}} was borrowed from you</p>
+                {% endif %}
+                {% elif not groups.tag == "group_creation" %}
+                <span class="card-title" style="position:absolute; top:10px; right:10px;">{{groups.username}}</span>
     <p>{{groups.activityname}}</p>
     <p>{{groups.username}} paid {{groups.money_gave}} and owes {{groups.money_took}}</p>
     {% endif %}
-{% endfor %}
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+  </div>
 
-{% for person in group_members %}
-    {% for groups in gtable %}
-        {% if person == groups.frname %}
-            <p>{{ person }} owes {{groups.netmoney}}</p>
-        {% endif%}
+  <div class="row">
+   {% for key,value in nets.items %}
+        <div class="col s12">
+           <div class="card blue-grey darken-1 hoverable" style="position: relative;">
+            <div class="card-content white-text">
+                <span class="card-title" >{{key}}</span>
+                {% if value < 0 %}
+                <p>{{key}} owes net {% widthratio value 1 -1 %}</p>
+                  {% elif entry > 0 %}
+        <p>{{key}} is owed {{value}}</p>
+                {% else %}
+              <p>Settled! nothing to pay</p>
+        {% endif %}
+            </div>
+          </div>
+        </div>
     {% endfor %}
-{% endfor %}
+</div>
 
-  {% for entry in nets %}
-  {% if entry < 0 %}
-  {{entry}} owes net {% widthratio entry 1 -1 %}
-  {% elif entry > 0 %}
-  {{entry}} is owed {{entry}}
-  {% endif %}
-  {% endfor %}
-
-  {% for ky in use %}
-  {% if ky < 0 %}
-  {{ky}} owes you {% widthratio ky 1 -1 %}
-  {% elif ky > 0 %}
-  You owe {{ky}} to {{ky}}
+  {% for key,value in use.items %}
+  {% if value < 0 %}
+  {{key}} owes you {% widthratio value 1 -1 %}
+  {% elif value > 0 %}
+  You owe {{value}} to {{key}}
   {% endif %}
   {% endfor %}
 

@@ -38,7 +38,7 @@ def friendspage(request):
 
 def flist(request):
     user = MyUser.objects.get(username=request.user)
-    return render(request=request, template_name="main/FTlist.html",
+    return render(request=request, template_name="main/duplicate.html",
                   context={"ftrans": FriendT.objects.filter(urname=user.username).order_by('time'),
                            "users": MyUser.objects.all})
 
@@ -47,7 +47,8 @@ def thokka(request, name):
     user = MyUser.objects.get(username=request.user)
     return render(request=request, template_name="main/FTlist.html",
                   context={"ftrans": FriendT.objects.filter(urname=user.username, fdname=name).order_by('time'),
-                           "users": MyUser.objects.all})
+                           "users": MyUser.objects.all, "friend": name,
+                           "groups": GroupTable.objects.filter(username=user.username)})
 
 
 def register(request):
@@ -126,8 +127,9 @@ def friends_form(request):
         if form.is_valid():
             name = form.cleaned_data.get('name')
             try:
+                user = request.user
                 friend = MyUser.objects.get(username=name)
-                FriendT.add_friend(request.user, friend)
+                FriendT.add_friend(user.username, friend.username)
                 return redirect("main:userpage")
             except MyUser.DoesNotExist:
                 messages.error(request, "User doesn't exist")
@@ -143,6 +145,7 @@ def transaction_form(request):
     if request.method == "POST":
         form = TransactionForm(request.POST)
         if form.is_valid():
+            user = request.user
             friend = form.cleaned_data.get('friend')
             money = form.cleaned_data.get('money')
             notes = form.cleaned_data.get('notes')
@@ -173,7 +176,7 @@ def transaction_form(request):
                         messages.error(request, "Please select Split by amounts if you want to specify amounts")
                     else:
                         money = -money / 2
-            FriendT.add_transaction(request.user, friend, money, notes, tag)
+            FriendT.add_transaction(user.username, friend, money, notes, tag)
             return redirect("main:userpage")
         else:
             messages.error(request, "Invalid Friend")
@@ -190,10 +193,12 @@ def insight(request):
         user = MyUser.objects.get(username=request.user)
         kavali = FriendT.objects.filter(time__lte=end, time__gte=start, urname=user.username).exclude(
             tag="friend_creation")
+        atlast = GroupTable.objects.filter(username=user.username)
         mydata = {}
         piedata = {}
         tdata = {}
         ddata = {}
+        gdata = {}
         tot = 0
         taken = 0
 
@@ -214,6 +219,18 @@ def insight(request):
                     mydata[entry.fdname] = [0, -entry.money]
                     tot -= entry.money
                     taken -= entry.money
+
+        for entry in atlast:
+            if entry.money > 0:
+                if entry.gpname in gdata:
+                    gdata[entry.gpname][0] += entry.money
+                else:
+                    gdata[entry.gpname] = [entry.money, 0]
+            elif entry.money < 0:
+                if entry.gpname in gdata:
+                    gdata[entry.gpname][1] -= entry.money
+                else:
+                    gdata[entry.gpname] = [0, -entry.money]
 
         for entry in kavali:
             if entry.fdname in piedata:
@@ -243,8 +260,11 @@ def insight(request):
         categories = list()
         categories1 = list()
         categories2 = list()
+        gcat = list()
         survived_series_data = list()
         not_survived_series_data = list()
+        series_data = list()
+        not_series_data = list()
         friends = list()
         tags = list()
         timedata = {}
@@ -268,6 +288,11 @@ def insight(request):
             categories.append(entry)
             survived_series_data.append(mon[0])
             not_survived_series_data.append(mon[1])
+
+        for entry, mon in gdata.items():
+            gcat.append(entry)
+            series_data.append(mon[0])
+            not_series_data.append(mon[1])
 
         for entry, mon in piedata.items():
             categories1.append(entry)
@@ -319,6 +344,30 @@ def insight(request):
             'series': [survived_series, not_survived_series]
         }
 
+        survived = {
+            'name': 'Lent',
+            'data': series_data,
+            'color': 'green'
+        }
+
+        not_survived = {
+            'name': 'Borrowed',
+            'data': not_series_data,
+            'color': 'red'
+        }
+
+        gchart = {
+            'chart': {'type': 'bar'},
+            'plotOptions': {
+                'series': {
+                    'stacking': 'normal'
+                }
+            },
+            'title': {'text': 'Lent and Borrowed amounts group wise'},
+            'xAxis': {'categories': gcat},
+            'series': [survived, not_survived]
+        }
+
         chart1 = {
             'chart': {'type': 'pie'},
             'title': {'text': 'Pie chart for expenditure among friends'},
@@ -363,12 +412,13 @@ def insight(request):
         dump1 = json.dumps(chart1)
         dump2 = json.dumps(chart2)
         dump3 = json.dumps(chart3)
+        dumpg = json.dumps(gchart)
 
         response = render(request=request,
                           template_name="main/insight.html",
                           context={"chart1": dump1, "chart2": dump2, "chart": dump, "chart3": dump3,
                                    'loaded_data': data_html,
-                                   "chart4": perc})
+                                   "chart4": perc, "gchart": dumpg})
 
     return response
     # return "%s?%s?%s" % (redirect('insight', args=(start, end,)))
@@ -445,13 +495,13 @@ def grouppage(request, group_name):
     values = {}
     gain = []
     loss = []
-    query1 = GroupTable.objects.filter(gpname=group_name, username=user.username)
+    query1 = GroupTable.objects.filter(gpname=group_name, username=user.username, checkmember=True)
     for members in query1:
         if members.frname not in group_members:
             group_members.append(members.frname)
     group_members.append(user.username)
     for mem in group_members:
-        query = GroupTable.objects.filter(gpname=group_name, username=mem)
+        query = GroupTable.objects.filter(gpname=group_name, username=mem, checkmember=True)
         for entry in query:
             if mem in values:
                 values[mem] += entry.money
@@ -488,7 +538,7 @@ def grouppage(request, group_name):
 
     return render(request=request, template_name="main/GTlist.html",
                   context={
-                      "gtrans": GroupTrans.objects.filter(gpname=group_name, username=user.username).order_by('time'),
+                      "gtrans": GroupTrans.objects.filter(gpname=group_name).order_by('time'),
                       "group_members": group_members,
                       "groupname": group_name,
                       "gtable": GroupTable.objects.filter(gpname=group_name, username=user.username).annotate(
@@ -604,12 +654,16 @@ def process_group_transaction(request, thisgroup_name):
         few_users = list()
         second_dict = []
         first_dict = []
+        hi = {}
         for entry in data:
             if entry.username not in few_users:
                 few_users.append(entry.username)
         for member in few_users:
             if int(request.POST[member]) != 0:
                 second_dict += [[member, int(request.POST[member])]]
+                GroupTrans.add_activity_and_user(thisgroup_name, activity_name, member, request.POST['Tag'],
+                                                 int(request.POST[member]),
+                                                 int(request.POST[member + ":new"]))
                 # first_dict[member] = int(request.POST[member + ":new"])
                 # amount_paid.append([member, int(request.POST[member])])
                 # split_amount.append([member, int(request.POST[member + ":new"])])
@@ -672,14 +726,17 @@ def splitunequally(user, amount_split, money):
     # amount_split.append([user.username,money-sum_others])
     return l2
 
-def splitequally(users,money):
-    size1=len(users)
-    nearest=int(money/size1)
-    l1=[]
-    for i in range(0,size1-1):
-        l1.append([users[i],nearest])
-    l1.append([users[i],money-(nearest*size1)])
+
+def splitequally(users, money):
+    size1 = len(users)
+    nearest = int(money / size1)
+    l1 = []
+    for i in range(0, size1 - 1):
+        l1.append([users[i], nearest])
+    l1.append([users[i], money - (nearest * size1)])
     return l1
+
+
 # def group_transaction_form(request,thisgroup_name):
 #     if request.method=="POST":
 #         form=ActivityTransactionForm(request.POST)
@@ -743,7 +800,6 @@ def splitequally(users,money):
 
 
 def settleup_ingroup(request, group_name):
-    user = request.user
     if request.method == "POST":
         form = SettleUpGroup(request.POST)
         if form.is_valid():
@@ -751,12 +807,18 @@ def settleup_ingroup(request, group_name):
             # saveform=form.save()
             users = form.cleaned_data.get('users')
             users_list = users.split(",")
+            addrow = list()
             for member in users_list:
                 l1 = GroupTable.objects.filter(gpname=group_name, username=user.username, frname=member).aggregate(
                     money_give_take=Sum('money'))
                 if l1['money_give_take'] != 0:
-                    GroupTable.add_rows(group_name, "settle up", user.username, member, -(l1['money_give_take']))
-                    GroupTable.add_rows(group_name, "settle up", member, user.username, l1['money_give_take'])
+                    if [group_name, "settle up", user.username, member, -(l1['money_give_take'])] not in addrow:
+                        print(addrow)
+                        addrow.append([group_name, "settle up", user.username, member, -(l1['money_give_take'])])
+                        addrow.append([group_name, "settle up", member, user.username, l1['money_give_take']])
+                        GroupTable.add_rows(group_name, "settle up", user.username, member, -(l1['money_give_take']))
+                        GroupTable.add_rows(group_name, "settle up", member, user.username, l1['money_give_take'])
+
                     if l1['money_give_take'] < 0:
                         GroupTrans.add_activity_and_user(group_name, "settle up", user.username, "settle up", 0,
                                                          -(l1['money_give_take']))
@@ -768,6 +830,36 @@ def settleup_ingroup(request, group_name):
                     return redirect("main:userpage")  # check once here
     form = SettleUpGroup()
     return render(request, "main/settleupgroup.html", {"form": form})
+
+
+def settleup(request, name):
+    user = MyUser.objects.get(username=request.user)
+    # l1 = GroupTable.objects.filter(username=user.username, frname=name)
+    # addrow = list()
+    # for entr in l1:
+    #     lt = GroupTable.objects.filter(username=user.username, gpname=entr.gpname, frname=name).aggregate(
+    #         money_give_take=Sum('money'))
+    #     if lt['money_give_take'] != 0:
+    #         if [entr, "settle up", user.username, name, -(lt['money_give_take'])] not in addrow:
+    #             addrow.append([entr, "settle up", user.username, name, -(lt['money_give_take'])])
+    #             addrow.append([entr, "settle up", name, user.username, lt['money_give_take']])
+    #             GroupTable.add_rows(entr, "settle up", user.username, name, -(lt['money_give_take']))
+    #             GroupTable.add_rows(entr, "settle up", name, user.username, lt['money_give_take'])
+    #         if lt['money_give_take'] < 0:
+    #             GroupTrans.add_activity_and_user(entr, "settle up", user.username, "settle up", 0,
+    #                                              -(lt['money_give_take']))
+    #         else:
+    #             GroupTrans.add_activity_and_user(entr, "settle up", user.username, "settle up",
+    #                                              lt['money_give_take'], 0)
+    #     elif lt['money_give_take'] == 0:
+    #         continue
+
+    l2 = FriendT.objects.filter(urname=user.username, fdname=name).aggregate(money_set=Sum('money'))
+    for entr in l2:
+        if l2['money_set'] != 0:
+            FriendT.add_transaction(user, name, -(l2['money_set']), "", "settling up")
+            FriendT.add_transaction(name, user, l2['money_set'], "", "settling up")
+    return redirect("main:userpage")
 
 
 #
@@ -799,7 +891,49 @@ def settleup_ingroup(request, group_name):
 #     return list3
 
 
-def leave_delete_group(request, group_name):
-    user = request.user
-    query1 = GroupTable.objects.filter(gpname=group_name, username=user.username).annotate(netmoney=Sum(money))
-    query2 = GroupTable.objects.filter(gpname=group_name, frname=user.username).annotate(netmoney=Sum(money))
+# def leave_delete_group(request,group_name,option):
+#     user=request.user
+#     val1=GroupTable.objects.filter(gpname=group_name,username=user.username).aggregate(netmoney=Sum('money'))
+#     val2=GroupTable.objects.filter(gpname=group_name,frname=user.username).aggregate(netmoney=Sum('money'))
+#     if option == "leave":
+#         if val1['netmoney'] == 0 and val2['netmoney'] == 0:
+#             GroupTable.objects.filter(gpname=group_name,username=user.username).update(checkmember=False)
+#             GroupTable.objects.filter(gpname=group_name,frname=user.username).update(checkmember=False)
+#             GroupTrans.objects.filter(gpname=group_name,username=user.username).update(checkmember=False)
+#             return redirect("main:groupslistpage")
+#         else:
+#             messages.error(request,"You are not settled yet")
+#     elif option == "delete":
+#         val3=GroupTable.objects.filter(gpname=group_name).aggregate(netmoney=Sum('money'))
+#         if val3 == 0:
+#             GroupTable.objects.filter(gpname=group_name).update(checkmember=False)
+#             GroupTrans.objects.filter(gpname=group_name).update(checkmember=False)
+#             return redirect("main:groupslistpage")
+#         else:
+#             messages.error(request, "Not everyone is settled")
+#     return redirect("main:groupslistpage")
+
+
+def leave_group(request, group_name):
+    user = user = request.user
+    val1 = GroupTable.objects.filter(gpname=group_name, username=user.username).aggregate(netmoney=Sum('money'))
+    val2 = GroupTable.objects.filter(gpname=group_name, frname=user.username).aggregate(netmoney=Sum('money'))
+    if val1['netmoney'] == 0 and val2['netmoney'] == 0:
+        GroupTable.objects.filter(gpname=group_name, username=user.username).update(checkmember=False)
+        GroupTable.objects.filter(gpname=group_name, frname=user.username).update(checkmember=False)
+        GroupTrans.objects.filter(gpname=group_name, username=user.username).update(checkmember=False)
+        return redirect("main:groupslistpage")
+    else:
+        messages.error(request, "You are not settled yet")
+    return redirect("main:groupslistpage")
+
+
+def delete_group(request, group_name):
+    val3 = GroupTable.objects.filter(gpname=group_name).aggregate(netmoney=Sum('money'))
+    if val3 == 0:
+        GroupTable.objects.filter(gpname=group_name).update(checkmember=False)
+        GroupTrans.objects.filter(gpname=group_name).update(checkmember=False)
+        return redirect("main:groupslistpage")
+    else:
+        messages.error(request, "Not everyone is settled")
+    return redirect("main:groupslistpage")

@@ -67,19 +67,19 @@
 
 <div class="row">
     {% for groups in grouptrans %}
+    {% if groups.tag == "group_creation" %}
         <div class="col s12 m6">
           <div class="card blue-grey darken-1 hoverable" style="position: relative;">
             <div class="card-content white-text">
-                {% if groups.tag == "group_creation" %}
                 <a href="{% url 'main:grouppage' group_name=groups.gpname %}">
                     <span class="card-title" style="position:absolute; top:2px; right:2px;">{{groups.gpname}}</span>
                 </a>
                     {% if groups.netmoney_owed < groups.netmoney_owes %}
-                <p style="position:absolute; top:2px; right:2px;">You owe {{groups.netmoney}} to this group</p>
+                <p>You owe {{groups.netmoney}} to this group</p>
                     {% elif groups.netmoney_owed == groups.netmoney_owes %}
-                <p style="position:absolute; bottom:2px; right:2px;">You are settled up!</p>
+                <p>Welcome to group</p>
                     {% elif friends.netmoney_owed  > groups.netmoney_owes %}
-                <p style="position:absolute;  right:2px;">Group Owes you {{groups.netmoney}}</p>
+                <p>Group Owes you {{groups.netmoney}}</p>
                     {% endif %}
                 {% endif %}
             </div>

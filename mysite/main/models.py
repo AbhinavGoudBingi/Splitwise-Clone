@@ -19,21 +19,21 @@ class FriendT(models.Model):
     money = models.IntegerField()
     description = models.TextField()
     tag = models.CharField(max_length=25)
-    time = models.CharField(default=datetime.now().strftime('%x'), max_length=25)
+    time = models.CharField(default=datetime.now().strftime('%Y-%m-%d'), max_length=25)
 
     @classmethod
     def add_friend(cls, current_user, new_friend):
         friend = cls.objects.get_or_create(
-            urname=current_user.username,
-            fdname=new_friend.username,
+            urname=current_user,
+            fdname=new_friend,
             money=0,
             description="",
             tag="friend_creation"
         )
 
         revfriend = cls.objects.get_or_create(
-            urname=new_friend.username,
-            fdname=current_user.username,
+            urname=new_friend,
+            fdname=current_user,
             money=0,
             description="",
             tag="friend_creation"
@@ -42,7 +42,7 @@ class FriendT(models.Model):
     @classmethod
     def add_transaction(cls, current_user, friend, money, notes, tag):
         transaction = cls.objects.get_or_create(
-            urname=current_user.username,
+            urname=current_user,
             fdname=friend,
             money=money,
             description=notes,
@@ -64,7 +64,8 @@ class GroupTable(models.Model):
     username = models.CharField(max_length=25, default=None)
     frname = models.CharField(max_length=25, default=None)
     money = models.IntegerField()
-    time = models.CharField(default=datetime.now().strftime('%x'), max_length=25)
+    time = models.CharField(default=datetime.now().strftime('%Y-%m-%d'), max_length=25)
+    checkmember=models.BooleanField(default=True)
 
     @classmethod
     def add_group(cls, group_name, user_name, friend_name):
@@ -81,6 +82,7 @@ class GroupTable(models.Model):
             activityname="group creation",
             frname=user_name,
             money=0,
+            checkmember=True,
         )
 
     @classmethod
@@ -91,6 +93,7 @@ class GroupTable(models.Model):
             username=user_name,
             frname=friend_name,
             money=money1,
+            checkmember=True,
         )
         revgroup1 = cls.objects.create(
             gpname=group_name,
@@ -98,6 +101,7 @@ class GroupTable(models.Model):
             username=friend_name,
             frname=user_name,
             money=-(money1),
+            checkmember=True,
         )
     # @classmethod
     # def forsettleup(cls,group_name,user_name,friend_name):
@@ -111,7 +115,8 @@ class GroupTrans(models.Model):
     money_took = models.IntegerField()
     tag = models.CharField(max_length=50)
     # description = models.TextField()
-    time = models.CharField(default=datetime.now().strftime('%x'), max_length=25)
+    time = models.CharField(default=datetime.now().strftime('%Y-%m-%d'), max_length=25)
+    checkmember=models.BooleanField(default=True)
 
     @classmethod
     def add_group(cls, current_user, group_name, friends):
@@ -122,7 +127,7 @@ class GroupTrans(models.Model):
             money_took=0,
             money_gave=0,
             tag="group_creation",
-            # description = notes,
+            checkmember=True,
         )
 
         for all_users in friends:
@@ -133,7 +138,7 @@ class GroupTrans(models.Model):
                 money_took=0,
                 money_gave=0,
                 tag="group_creation",
-                # description=notes,
+                checkmember=True,
             )
 
     @classmethod
@@ -144,7 +149,8 @@ class GroupTrans(models.Model):
             username=user,
             tag=tagging,
             money_gave=money_owed,
-            money_took=money_owes,)
+            money_took=money_owes,
+            checkmember=True,)
     # @classmethod
     # def add_transaction(cls,group_name,current_user,friend,notes,money):
     #     transaction_add = cls.objects.get_or_create(

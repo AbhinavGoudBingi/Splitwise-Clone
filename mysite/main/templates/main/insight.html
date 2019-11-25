@@ -58,6 +58,8 @@
 
 <div id="container"></div>
 <br><br>
+<div id="containerg"></div>
+<br><br>
 <div id="container1"></div>
 <br><br>
 <div id="container3"></div>
@@ -98,7 +100,7 @@ function myFunction() {
    Highcharts.chart('container1', {{ chart1|safe }});
     Highcharts.chart('container2', {{ chart2|safe }});
     Highcharts.chart('container3', {{ chart3|safe }});
-    //Highcharts.chart('container-speed', {{ chart4|safe }});
+    Highcharts.chart('containerg', {{ gchart|safe }});
 var gaugeOptions = {
     chart: {
         type: 'solidgauge'

@@ -45,6 +45,9 @@ urlpatterns = [
     path("groupslistpage/", views.groupslistpage, name="groupslistpage"),
     path("grouppage/<str:group_name>", views.grouppage, name="grouppage"),
     path("ouredirect/<str:name>", views.ouredirect, name="ouredirect"),
+    path("settleup/<str:name>", views.settleup, name="settleup"),
+    path("leave_group/<str:group_name>",views.leave_group,name="leave_group"),
+    path("delete_group/<str:group_name>",views.delete_group,name="delete_group"),
 ]
 
 if settings.DEBUG:
