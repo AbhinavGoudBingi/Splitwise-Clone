@@ -407,7 +407,7 @@ def insight(request):
             }]
         }
 
-        perc = taken * 100 // tot
+        perc = taken * 100 // (tot if tot!=0 else 1)
         dump = json.dumps(chart)
         dump1 = json.dumps(chart1)
         dump2 = json.dumps(chart2)
