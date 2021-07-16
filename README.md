@@ -1,5 +1,1 @@
-Settle up in friends does settling up only in friends and group settle up includes settling up for individuals in the group
-respect to the user.
-For recording Transactions in groups we must mention the amount by each (i.e, split equally is not automatic in groups).
-Profile picture can't be changed from that at the time of registration.
-Net group status being shown are directly implemented using the special feature of reducing transactions.
+This repository contains my code for the project done as part of the course CS 251 - Software and Systems lab at IIT Bombay under prof. Amitabha Sanyal in the Autumn 2019-20 Semester. The Inlabs are done by me and the Outlabs are done by my team Chaos_club - Abhinav Goud Bingi(180050002), Hrithik Vikas Samala(180050038), Rishyanth Kondra(180050050).
